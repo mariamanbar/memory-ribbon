@@ -23,6 +23,7 @@ function loadData() {
     const stored = localStorage.getItem('memory_ribbon_data');
     if (stored) {
         photos = JSON.parse(stored);
+        // Ensure they are sorted on load
         sortPhotos();
     } else {
         photos = [];
@@ -138,6 +139,7 @@ window.addEventListener('mouseup', (e) => {
     // If moved less than 5px and faster than 200ms, it's a click
     if (dist < 5 && time < 400) {
         // Find what was clicked
+        // We use composedPath to find the .card-wrapper parent
         const path = e.composedPath();
         const wrapper = path.find(el => el.classList && el.classList.contains('card-wrapper'));
         if (wrapper) {
@@ -187,8 +189,8 @@ function openModal(index) {
         // Edit Existing
         const p = photos[index];
         document.getElementById('modal-title').innerText = "Edit Memory";
-        inpUrl.value = p.url.startsWith('data:') ? '' : p.url; 
-        inpFile.value = ""; 
+        inpUrl.value = p.url.startsWith('data:') ? '' : p.url; // Don't show base64 string in text input
+        inpFile.value = ""; // Can't pre-fill file input
         inpDate.value = p.date;
         inpNote.value = p.note;
         btnDelete.style.display = 'block';
@@ -204,6 +206,7 @@ document.getElementById('btn-save').addEventListener('click', () => {
     const index = parseInt(editIndex.value);
     const file = inpFile.files[0];
     
+    // Helper to finalize save after getting image data
     const finishSave = (finalUrl) => {
         const entry = {
             url: finalUrl,
@@ -217,11 +220,13 @@ document.getElementById('btn-save').addEventListener('click', () => {
             photos[index] = entry;
         }
 
-        // 1. Sort
+        // 1. Sort the photos by date
         sortPhotos();
-        // 2. Find new index
+
+        // 2. Find where our entry ended up after sorting
         const newIndex = photos.indexOf(entry);
-        // 3. Scroll to it
+
+        // 3. Scroll to that specific position
         targetAngle = newIndex * THETA;
 
         saveData();
@@ -231,6 +236,7 @@ document.getElementById('btn-save').addEventListener('click', () => {
     };
 
     if (file) {
+        // Convert file to Base64
         const reader = new FileReader();
         reader.onload = function(e) {
             finishSave(e.target.result);
@@ -239,6 +245,7 @@ document.getElementById('btn-save').addEventListener('click', () => {
     } else if (inpUrl.value) {
         finishSave(inpUrl.value);
     } else if (index !== -1) {
+        // Editing, but didn't change image -> keep old one
         finishSave(photos[index].url);
     } else {
         alert("Please provide an image URL or upload a file.");
@@ -254,6 +261,7 @@ btnDelete.addEventListener('click', () => {
         buildDOM();
         checkEmptyState();
         closeModal();
+        // Adjust scroll if we deleted the last item
         clampScroll();
     }
 });
@@ -261,6 +269,7 @@ btnDelete.addEventListener('click', () => {
 document.getElementById('btn-cancel').addEventListener('click', closeModal);
 document.getElementById('fab-add').addEventListener('click', () => openModal(-1));
 
+// Helper
 function formatDate(str) {
     if(!str) return '';
     const d = new Date(str);
