@@ -34,4 +34,6 @@ Or run it locally:
 * Vanilla JavaScript
 
 ---
-*Made with nostalgia.*
+<div align="center">
+  Made with nostalgia.
+</div>
