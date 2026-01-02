@@ -11,7 +11,7 @@ body, html {
     margin: 0;
     padding: 0;
     height: 100%;
-    /* Updated to Handwritten Font */
+    /* The Handwritten Font */
     font-family: 'Caveat', cursive;
     font-size: 18px; 
     background: radial-gradient(circle at center, #ffffff 0%, #f0f0f0 100%);
@@ -19,7 +19,7 @@ body, html {
     user-select: none;
 }
 
-/* --- 3D Scene --- */
+/* for 3D Scene  */
 #scene-viewport {
     width: 100%;
     height: 100%;
@@ -102,7 +102,7 @@ body, html {
     overflow: hidden;
 }
 
-/* --- UI Elements --- */
+/*  UI Elements */
 
 /* Floating Add Button */
 #fab-add {
@@ -143,7 +143,7 @@ body, html {
 #empty-msg h2 { margin: 0; font-size: 2rem; font-weight: normal; }
 #empty-msg p { font-size: 1.2rem; }
 
-/* --- Modal --- */
+/* Modal */
 #modal-overlay {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
