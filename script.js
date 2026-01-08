@@ -1,9 +1,9 @@
-// --- Configuration ---
+// configuration
 const RADIUS = 900; 
-const THETA = 18; // Degrees separation
+const THETA = 18; // degrees separation
 
-// --- State ---
-let photos = []; // Will load from LocalStorage
+// state 
+let photos = []; // will load from LocalStorage
 let targetAngle = 0;
 let currentAngle = 0;
 
@@ -13,17 +13,17 @@ let startX = 0;
 let lastX = 0;
 let dragStartTime = 0;
 
-// DOM References
+// DOM references
 const track = document.getElementById('ribbon-track');
 const emptyMsg = document.getElementById('empty-msg');
 const viewport = document.getElementById('scene-viewport');
 
-// --- 1. Load Data ---
+// 1. Load Data 
 function loadData() {
     const stored = localStorage.getItem('memory_ribbon_data');
     if (stored) {
         photos = JSON.parse(stored);
-        // Ensure they are sorted on load
+        // ensure they are sorted on load
         sortPhotos();
     } else {
         photos = [];
@@ -58,13 +58,13 @@ function checkEmptyState() {
     }
 }
 
-// --- 2. Render Loop (Physics) ---
+// 2. Render Loop (Physics) 
 function buildDOM() {
     track.innerHTML = '';
     photos.forEach((photo, i) => {
         const div = document.createElement('div');
         div.className = 'card-wrapper';
-        div.dataset.index = i; // Save index for clicking
+        div.dataset.index = i; // save index for clicking
         
         // Initial Static Position
         const angle = i * THETA;
@@ -84,10 +84,10 @@ function buildDOM() {
 }
 
 function animate() {
-    // Smooth scroll physics
+    // smooth scroll physics
     currentAngle += (targetAngle - currentAngle) * 0.1;
     
-    // Move the track
+    // move the track
     track.style.transform = `translateZ(-${RADIUS}px) rotateY(${-currentAngle}deg)`;
 
     // Opacity/Visibility Logic
@@ -96,10 +96,10 @@ function animate() {
         const cardAngle = i * THETA;
         const diff = Math.abs(cardAngle - currentAngle);
         
-        // Fade out distant cards
+        // fade out distant cards
         if (diff > 60) {
             card.style.opacity = Math.max(0, 1 - (diff - 60) / 20);
-            card.style.pointerEvents = 'none'; // Don't click invisible cards
+            card.style.pointerEvents = 'none'; // don't click invisible cards
         } else {
             card.style.opacity = 1;
             card.style.pointerEvents = 'auto';
@@ -124,7 +124,7 @@ window.addEventListener('mousemove', (e) => {
     e.preventDefault();
     const delta = e.clientX - lastX;
     lastX = e.clientX;
-    targetAngle -= delta * 0.15; // Scroll speed
+    targetAngle -= delta * 0.15; // scroll speed
 });
 
 window.addEventListener('mouseup', (e) => {
@@ -132,7 +132,7 @@ window.addEventListener('mouseup', (e) => {
     isDragging = false;
     viewport.style.cursor = 'grab';
 
-    // Detect "Click" vs "Drag"
+    // detect "Click" vs "Drag"
     const dist = Math.abs(e.clientX - startX);
     const time = Date.now() - dragStartTime;
 
@@ -177,7 +177,7 @@ function clampScroll() {
     if (targetAngle > max + padding) targetAngle = max + padding;
 }
 
-// --- 4. Modal & Data Logic ---
+// 4. Modal & Data Logic 
 const modal = document.getElementById('modal-overlay');
 const inpFile = document.getElementById('inp-file');
 const inpUrl = document.getElementById('inp-url');
@@ -191,7 +191,7 @@ function openModal(index) {
     editIndex.value = index;
     
     if (index === -1) {
-        // New Entry
+        // new entry
         document.getElementById('modal-title').innerText = "Add New Memory";
         inpUrl.value = "";
         inpFile.value = "";
@@ -199,11 +199,11 @@ function openModal(index) {
         inpNote.value = "";
         btnDelete.style.display = 'none';
     } else {
-        // Edit Existing
+        // edit existing
         const p = photos[index];
         document.getElementById('modal-title').innerText = "Edit Memory";
-        inpUrl.value = p.url.startsWith('data:') ? '' : p.url; // Don't show base64 string in text input
-        inpFile.value = ""; // Can't pre-fill file input
+        inpUrl.value = p.url.startsWith('data:') ? '' : p.url; // don't show base64 string in text input
+        inpFile.value = ""; // cuz can't pre-fill file input
         inpDate.value = p.date;
         inpNote.value = p.note;
         btnDelete.style.display = 'block';
