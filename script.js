@@ -109,7 +109,7 @@ function animate() {
     requestAnimationFrame(animate);
 }
 
-// --- 3. Interaction (Drag vs Click) ---
+// --- 3. Interaction (Drag, Click, Keyboard) ---
 
 viewport.addEventListener('mousedown', (e) => {
     isDragging = true;
@@ -146,6 +146,19 @@ window.addEventListener('mouseup', (e) => {
             openModal(parseInt(wrapper.dataset.index));
         }
     }
+
+    //  Keyboard Navigation 
+document.addEventListener('keydown', (e) => {
+    if (modal.classList.contains('open')) return; // Don't scroll if modal is open
+
+    if (e.key === 'ArrowRight') {
+        targetAngle += THETA;
+        clampScroll();
+    } else if (e.key === 'ArrowLeft') {
+        targetAngle -= THETA;
+        clampScroll();
+    }
+});
     
     clampScroll();
 });
