@@ -11,7 +11,6 @@ body, html {
     margin: 0;
     padding: 0;
     height: 100%;
-    /* The Handwritten Font */
     font-family: 'Caveat', cursive;
     font-size: 18px; 
     background: radial-gradient(circle at center, #ffffff 0%, #f0f0f0 100%);
@@ -19,7 +18,6 @@ body, html {
     user-select: none;
 }
 
-/* for 3D Scene  */
 #scene-viewport {
     width: 100%;
     height: 100%;
@@ -35,10 +33,9 @@ body, html {
 #ribbon-track {
     position: absolute;
     transform-style: preserve-3d;
-    pointer-events: none; /* Let drag pass through */
+    pointer-events: none; 
 }
 
-/* The Card */
 .card-wrapper {
     position: absolute;
     width: var(--card-width);
@@ -48,7 +45,7 @@ body, html {
     margin-left: calc(var(--card-width) / -2);
     margin-top: calc(var(--card-height) / -2);
     transform-style: preserve-3d;
-    pointer-events: auto; /* Re-enable clicks */
+    pointer-events: auto; 
     will-change: transform, opacity;
     transition: filter 0.3s;
 }
@@ -102,9 +99,7 @@ body, html {
     overflow: hidden;
 }
 
-/*  UI Elements */
 
-/* Floating Add Button */
 #fab-add {
     position: fixed;
     bottom: 30px;
@@ -123,14 +118,13 @@ body, html {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'Segoe UI', sans-serif; /* Keep button simple */
+    font-family: 'Segoe UI', sans-serif; 
 }
 #fab-add:hover {
     transform: scale(1.1) rotate(90deg);
     background-color: var(--accent-color);
 }
 
-/* Empty State Message */
 #empty-msg {
     position: absolute;
     text-align: center;
@@ -143,7 +137,6 @@ body, html {
 #empty-msg h2 { margin: 0; font-size: 2rem; font-weight: normal; }
 #empty-msg p { font-size: 1.2rem; }
 
-/* Modal */
 #modal-overlay {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
