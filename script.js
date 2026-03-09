@@ -1,29 +1,23 @@
-// configuration
 const RADIUS = 900; 
-const THETA = 18; // degrees separation
+const THETA = 18; 
 
-// state 
-let photos = []; // will load from LocalStorage
+let photos = []; 
 let targetAngle = 0;
 let currentAngle = 0;
 
-// Drag/Click Logic
 let isDragging = false;
 let startX = 0;
 let lastX = 0;
 let dragStartTime = 0;
 
-// DOM references
 const track = document.getElementById('ribbon-track');
 const emptyMsg = document.getElementById('empty-msg');
 const viewport = document.getElementById('scene-viewport');
 
-// 1. Load Data 
 function loadData() {
     const stored = localStorage.getItem('memory_ribbon_data');
     if (stored) {
         photos = JSON.parse(stored);
-        // ensure they are sorted on load
         sortPhotos();
     } else {
         photos = [];
@@ -32,7 +26,6 @@ function loadData() {
     buildDOM();
 }
 
-// Helper: Sort Ascending by Date
 function sortPhotos() {
     photos.sort((a, b) => {
         const da = new Date(a.date);
@@ -58,15 +51,13 @@ function checkEmptyState() {
     }
 }
 
-// 2. Render Loop (Physics) 
 function buildDOM() {
     track.innerHTML = '';
     photos.forEach((photo, i) => {
         const div = document.createElement('div');
         div.className = 'card-wrapper';
-        div.dataset.index = i; // save index for clicking
+        div.dataset.index = i; 
         
-        // Initial Static Position
         const angle = i * THETA;
         div.style.transform = `rotateY(${angle}deg) translateZ(${RADIUS}px)`;
 
@@ -84,22 +75,18 @@ function buildDOM() {
 }
 
 function animate() {
-    // smooth scroll physics
     currentAngle += (targetAngle - currentAngle) * 0.1;
     
-    // move the track
     track.style.transform = `translateZ(-${RADIUS}px) rotateY(${-currentAngle}deg)`;
 
-    // Opacity/Visibility Logic
     const cards = document.querySelectorAll('.card-wrapper');
     cards.forEach((card, i) => {
         const cardAngle = i * THETA;
         const diff = Math.abs(cardAngle - currentAngle);
         
-        // fade out distant cards
         if (diff > 60) {
             card.style.opacity = Math.max(0, 1 - (diff - 60) / 20);
-            card.style.pointerEvents = 'none'; // don't click invisible cards
+            card.style.pointerEvents = 'none'; 
         } else {
             card.style.opacity = 1;
             card.style.pointerEvents = 'auto';
@@ -108,8 +95,6 @@ function animate() {
 
     requestAnimationFrame(animate);
 }
-
-// --- 3. Interaction (Drag, Click, Keyboard) ---
 
 viewport.addEventListener('mousedown', (e) => {
     isDragging = true;
@@ -124,7 +109,7 @@ window.addEventListener('mousemove', (e) => {
     e.preventDefault();
     const delta = e.clientX - lastX;
     lastX = e.clientX;
-    targetAngle -= delta * 0.15; // scroll speed
+    targetAngle -= delta * 0.15; 
 });
 
 window.addEventListener('mouseup', (e) => {
@@ -132,14 +117,10 @@ window.addEventListener('mouseup', (e) => {
     isDragging = false;
     viewport.style.cursor = 'grab';
 
-    // detect "Click" vs "Drag"
     const dist = Math.abs(e.clientX - startX);
     const time = Date.now() - dragStartTime;
 
-    // If moved less than 5px and faster than 200ms, it's a click
     if (dist < 5 && time < 400) {
-        // Find what was clicked
-        // We use composedPath to find the .card-wrapper parent
         const path = e.composedPath();
         const wrapper = path.find(el => el.classList && el.classList.contains('card-wrapper'));
         if (wrapper) {
@@ -147,9 +128,8 @@ window.addEventListener('mouseup', (e) => {
         }
     }
 
-    //  Keyboard Navigation 
 document.addEventListener('keydown', (e) => {
-    if (modal.classList.contains('open')) return; // Don't scroll if modal is open
+    if (modal.classList.contains('open')) return; 
 
     if (e.key === 'ArrowRight') {
         targetAngle += THETA;
@@ -163,7 +143,6 @@ document.addEventListener('keydown', (e) => {
     clampScroll();
 });
 
-// Mouse Wheel
 viewport.addEventListener('wheel', (e) => {
     targetAngle += e.deltaY * 0.05;
     clampScroll();
@@ -177,7 +156,6 @@ function clampScroll() {
     if (targetAngle > max + padding) targetAngle = max + padding;
 }
 
-// 4. Modal & Data Logic 
 const modal = document.getElementById('modal-overlay');
 const inpFile = document.getElementById('inp-file');
 const inpUrl = document.getElementById('inp-url');
@@ -191,7 +169,6 @@ function openModal(index) {
     editIndex.value = index;
     
     if (index === -1) {
-        // new entry
         document.getElementById('modal-title').innerText = "Add New Memory";
         inpUrl.value = "";
         inpFile.value = "";
@@ -199,11 +176,10 @@ function openModal(index) {
         inpNote.value = "";
         btnDelete.style.display = 'none';
     } else {
-        // edit existing
         const p = photos[index];
         document.getElementById('modal-title').innerText = "Edit Memory";
-        inpUrl.value = p.url.startsWith('data:') ? '' : p.url; // don't show base64 string in text input
-        inpFile.value = ""; // cuz can't pre-fill file input
+        inpUrl.value = p.url.startsWith('data:') ? '' : p.url; 
+        inpFile.value = ""; 
         inpDate.value = p.date;
         inpNote.value = p.note;
         btnDelete.style.display = 'block';
@@ -214,12 +190,10 @@ function closeModal() {
     modal.classList.remove('open');
 }
 
-// Save Logic
 document.getElementById('btn-save').addEventListener('click', () => {
     const index = parseInt(editIndex.value);
     const file = inpFile.files[0];
     
-    // Helper to finalize save after getting image data
     const finishSave = (finalUrl) => {
         const entry = {
             url: finalUrl,
@@ -233,13 +207,10 @@ document.getElementById('btn-save').addEventListener('click', () => {
             photos[index] = entry;
         }
 
-        // 1. Sort the photos by date
         sortPhotos();
 
-        // 2. Find where our entry ended up after sorting
         const newIndex = photos.indexOf(entry);
 
-        // 3. Scroll to that specific position
         targetAngle = newIndex * THETA;
 
         saveData();
@@ -249,7 +220,6 @@ document.getElementById('btn-save').addEventListener('click', () => {
     };
 
     if (file) {
-        // Convert file to Base64
         const reader = new FileReader();
         reader.onload = function(e) {
             finishSave(e.target.result);
@@ -258,14 +228,12 @@ document.getElementById('btn-save').addEventListener('click', () => {
     } else if (inpUrl.value) {
         finishSave(inpUrl.value);
     } else if (index !== -1) {
-        // Editing, but didn't change image -> keep old one
         finishSave(photos[index].url);
     } else {
         alert("Please provide an image URL or upload a file.");
     }
 });
 
-// Delete Logic
 btnDelete.addEventListener('click', () => {
     const index = parseInt(editIndex.value);
     if (confirm("Delete this memory?")) {
@@ -274,7 +242,6 @@ btnDelete.addEventListener('click', () => {
         buildDOM();
         checkEmptyState();
         closeModal();
-        // Adjust scroll if we deleted the last item
         clampScroll();
     }
 });
@@ -282,13 +249,11 @@ btnDelete.addEventListener('click', () => {
 document.getElementById('btn-cancel').addEventListener('click', closeModal);
 document.getElementById('fab-add').addEventListener('click', () => openModal(-1));
 
-// Helper
 function formatDate(str) {
     if(!str) return '';
     const d = new Date(str);
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
-// Init
 loadData();
 animate();
